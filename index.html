@@ -2,616 +2,803 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>BECOME A FURRY! 3D — Infection Tag</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Infection Tag 3D — Halloween Edition</title>
 <style>
-:root{--bg:#101426;--panel:#1b2240;--purple:#9d75ff;--pink:#ff77c8;--cyan:#69e7ff;--text:#f7f5ff}
+:root{--bg:#151126;--panel:#211a38;--purple:#a66bff;--orange:#ff8a26;--pink:#ff6ec7;--text:#fff7ee}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Arial,sans-serif;overflow:hidden}
-button,input{font:inherit}
-button{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #493c82}
-button:active{transform:translateY(3px);box-shadow:0 2px 0 #493c82}
-button.secondary{background:#343b61;box-shadow:0 4px 0 #202541}
-#scene{position:fixed;inset:0;display:none}
-canvas{display:block}
-.panel{background:rgba(20,25,49,.94);border:1px solid #55558a;border-radius:20px;padding:22px;box-shadow:0 16px 50px #0008;backdrop-filter:blur(8px)}
-.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;background:radial-gradient(ellipse at top,#393267 0%,#171b35 48%,#101426 100%)}
-#menuPanel{width:min(620px,100%);text-align:center}
-h1{font-size:clamp(27px,6vw,48px);line-height:1.02;margin:0 0 10px;text-shadow:0 4px #3e286e}
-h2{margin:0 0 12px}
-.subtitle{color:#d3d5ff;margin-bottom:22px}
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:12px 15px;color:white;background:linear-gradient(135deg,var(--purple),var(--orange));box-shadow:0 4px 0 #56376c;cursor:pointer}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 #56376c}
+.secondary{background:#39304f;box-shadow:0 4px 0 #241d36}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;background:radial-gradient(ellipse at top,#4b2866,#201832 55%,#100d1d)}
+.panel{width:min(640px,100%);background:#1c1730f5;border:1px solid #76549a;border-radius:22px;padding:22px;box-shadow:0 20px 70px #0009;text-align:center}
+h1{font-size:clamp(28px,6vw,48px);margin:0 0 8px;line-height:1.05;text-shadow:0 4px #4b2866}
+h2{margin:8px 0}
+.sub,.small{color:#d5c8ed;font-size:13px;line-height:1.45}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}
 .wide{grid-column:1/-1}
-.small{font-size:13px;color:#c3c8ec;line-height:1.4}
 .hidden{display:none!important}
-.field{width:100%;padding:13px;border-radius:12px;border:2px solid #565d8b;background:#0e1328;color:white;margin:8px 0 12px;text-transform:uppercase}
-.roomcode{font-size:clamp(27px,7vw,40px);font-weight:1000;letter-spacing:5px;color:#80f2ff;background:#0e1328;border:1px dashed #80f2ff;border-radius:14px;padding:12px;margin:12px 0}
-#hud{position:fixed;inset:0;pointer-events:none;display:none}
-.hudbox{position:absolute;top:12px;background:#11172ddd;border:1px solid #62699a;border-radius:13px;padding:10px 13px;font-weight:800;pointer-events:auto}
-.left{left:12px}.right{right:12px;text-align:right}
-.center{top:12px;left:50%;transform:translateX(-50%);text-align:center}
-.hudbutton{padding:8px 11px;margin-top:5px}
-.message{position:absolute;top:80px;left:50%;transform:translateX(-50%);background:#161a34e8;padding:10px 14px;border-radius:12px;text-align:center;max-width:90%;font-weight:700}
-.controls{position:absolute;bottom:20px;left:18px;display:grid;grid-template-columns:repeat(3,52px);gap:5px;pointer-events:auto}
-.controls button{padding:9px;background:#222b50dd;box-shadow:none;border:1px solid #7880b0;font-size:18px}
-.controls button:nth-child(1){grid-column:2}
-.controls button:nth-child(2){grid-column:1;grid-row:2}
-.controls button:nth-child(3){grid-column:2;grid-row:2}
-.controls button:nth-child(4){grid-column:3;grid-row:2}
-#actionBtn{position:absolute;bottom:32px;right:20px;pointer-events:auto;border-radius:50%;width:82px;height:82px;padding:5px;background:linear-gradient(135deg,#ff7dc8,#9d75ff)}
-#endPanel{width:min(520px,100%);text-align:center}
-.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
-.stat{background:#0d132a;padding:10px 14px;border-radius:12px}
-@media(min-width:800px){.controls{bottom:24px;left:24px}.message{top:92px}}
+.choices{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.choice{flex:1;min-width:130px}
+.choice.selected{outline:3px solid #fff;outline-offset:2px}
+.wheelWrap{margin:14px auto;position:relative;width:min(290px,75vw);aspect-ratio:1}
+.wheelWrap canvas{width:100%;height:100%;border-radius:50%;filter:drop-shadow(0 7px 12px #0008)}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:2;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:0;border-bottom:30px solid #fff;filter:drop-shadow(0 2px 2px #000)}
+#scene{position:fixed;inset:0;display:none}
+#hud{position:fixed;inset:0;display:none;pointer-events:none}
+.hudbox{position:absolute;top:10px;background:#171127e8;border:1px solid #805ba5;border-radius:12px;padding:9px 12px;font-weight:800;pointer-events:auto}
+.left{left:10px}
+.right{right:10px;text-align:right}
+.center{left:50%;transform:translateX(-50%);text-align:center}
+.small{font-size:12px}
+.hudbutton{padding:7px 10px;margin-top:5px}
+.message{position:absolute;top:80px;left:50%;transform:translateX(-50%);background:#171127e8;padding:9px 14px;border-radius:12px;max-width:92%;text-align:center;font-weight:800}
+.dpad{position:absolute;left:15px;bottom:20px;display:grid;grid-template-columns:repeat(3,48px);gap:5px;pointer-events:auto}
+.dpad button{padding:8px;background:#302548dc;box-shadow:none;border:1px solid #8767aa}
+.dpad button:nth-child(1){grid-column:2}
+.dpad button:nth-child(2){grid-column:1;grid-row:2}
+.dpad button:nth-child(3){grid-column:2;grid-row:2}
+.dpad button:nth-child(4){grid-column:3;grid-row:2}
+#sprintBtn{position:absolute;right:18px;bottom:25px;width:90px;height:64px;padding:5px;pointer-events:auto;background:linear-gradient(135deg,#ff9d29,#e64f25);box-shadow:0 4px #87361d;touch-action:none}
+#actionBtn{position:absolute;right:22px;bottom:102px;width:76px;height:76px;border-radius:50%;padding:4px;pointer-events:auto}
+#endPanel{width:min(500px,100%)}
+.skinPreview{font-size:52px;margin:4px}
+.footer{margin-top:16px}
+@media(min-width:800px){.dpad{left:25px;bottom:25px}.message{top:90px}}
 </style>
 </head>
 <body>
+
 <div id="scene"></div>
 
 <div id="menu" class="screen">
-  <div id="menuPanel" class="panel">
-    <h1>🐾 BECOME A FURRY! 3D</h1>
-    <div class="subtitle">INFECTION TAG • BOT & ROOM-CODE TEST</div>
+ <div class="panel">
+  <h1>🎃 INFECTION TAG 3D 👻</h1>
+  <div class="sub">HALLOWEEN EDITION • PLAY AGAINST BOTS</div>
 
-    <div class="buttons">
-      <button id="soloBtn" class="wide">▶ PLAY WITH BOTS</button>
-      <button id="hostBtn">🏠 HOST MATCH</button>
-      <button id="joinBtn">🔑 JOIN MATCH</button>
-      <button id="garageBtn" class="secondary">🎨 SKINS</button>
-      <button id="helpBtn" class="secondary">❔ HOW IT WORKS</button>
-    </div>
+  <div id="mainMenu">
+   <h2>Choose your map</h2>
+   <div class="choices">
+    <button id="regularMap" class="choice selected">🌳 Regular Map</button>
+    <button id="halloweenMap" class="choice">🎃 Halloween Limited</button>
+   </div>
 
-    <div id="roomArea" class="hidden" style="margin-top:18px;text-align:left">
-      <h2 id="roomTitle">Room</h2>
-      <div class="small" id="roomExplain"></div>
-      <div id="roomCode" class="roomcode">------</div>
-      <div class="small" id="roomDetails"></div>
+   <p class="small" id="mapDescription">Classic grassy arena, trees, and coin pickups.</p>
 
-      <input id="joinCode" class="field hidden" maxlength="6"
-        placeholder="ENTER 6-CHARACTER CODE" autocomplete="off">
-
-      <div class="buttons">
-        <button id="copyBtn" class="secondary">📋 COPY CODE</button>
-        <button id="refreshBtn" class="secondary">↻ REFRESH LOBBY</button>
-        <button id="startRoomBtn" class="wide">START MATCH</button>
-        <button id="closeRoomBtn" class="wide secondary">BACK TO MENU</button>
-      </div>
-      <p id="roomStatus" class="small"></p>
-    </div>
-
-    <div id="garageArea" class="hidden" style="margin-top:18px">
-      <h2>Skin Garage</h2>
-      <p class="small">Choose your look. These choices save on this browser.</p>
-      <div class="buttons">
-        <button data-skin="classic" class="secondary">🐺 Classic</button>
-        <button data-skin="fox" class="secondary">🦊 Fox</button>
-        <button data-skin="cat" class="secondary">🐱 Cat</button>
-        <button data-skin="neon" class="secondary">✨ Neon</button>
-        <button id="garageBack" class="wide">BACK</button>
-      </div>
-      <p id="skinStatus" class="small"></p>
-    </div>
-
-    <p class="small" style="margin:18px 0 0">
-      LocalStorage test: room data is stored only in this browser.
-      It does not connect separate devices.
-    </p>
+   <div class="buttons">
+    <button id="playBtn" class="wide">🎡 SPIN FOR YOUR ROLE</button>
+    <button id="skinBtn" class="wide secondary">🦇 HALLOWEEN FURRY SKIN</button>
+   </div>
   </div>
+
+  <div id="wheelPanel" class="hidden">
+   <h2>🎡 Who will you be?</h2>
+   <p class="small">Spin to find out if you're a Human or a Furry!</p>
+   <div class="wheelWrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="500" height="500"></canvas>
+   </div>
+   <h2 id="wheelResult">Ready to spin?</h2>
+   <div class="buttons">
+    <button id="spinBtn" class="wide">SPIN THE WHEEL</button>
+    <button id="startBtn" class="wide hidden">START ROUND</button>
+    <button id="wheelBack" class="wide secondary">BACK</button>
+   </div>
+  </div>
+
+  <div id="skinPanel" class="hidden">
+   <div class="skinPreview">🐺🎃</div>
+   <h2>Halloween Furry Skin</h2>
+   <p class="small">A spooky purple-and-orange furry look with glowing pumpkin colors, ears, and a tail.</p>
+   <button id="equipSkin" class="wide">EQUIP HALLOWEEN SKIN</button>
+   <p id="skinStatus" class="small">Skin not equipped.</p>
+   <button id="skinBack" class="wide secondary" style="margin-top:10px">BACK</button>
+  </div>
+
+  <p class="small footer">
+   Controls: WASD / arrow keys on computer, touch arrows on phones.
+   Hold SPRINT to move faster.
+  </p>
+ </div>
 </div>
 
 <div id="hud">
-  <div class="hudbox left">
-    🐾 <span id="roleLabel">HUMAN</span><br>
-    <span class="small">Coins: <span id="coins">0</span></span><br>
-    <button id="leaveBtn" class="secondary hudbutton">LEAVE</button>
-  </div>
-  <div class="hudbox center">
-    ⏱ <span id="timer">5:00</span><br>
-    <span class="small" id="roundInfo">Find a way to survive!</span>
-  </div>
-  <div class="hudbox right">
-    Room: <span id="hudCode">SOLO</span><br>
-    <span class="small">Bots: <span id="botCount">10</span></span>
-  </div>
-  <div class="message" id="message">Avoid the infected!</div>
-  <div class="controls">
-    <button data-move="up">▲</button>
-    <button data-move="left">◀</button>
-    <button data-move="down">▼</button>
-    <button data-move="right">▶</button>
-  </div>
-  <button id="actionBtn">TAG!</button>
+ <div class="hudbox left">
+  🐾 <span id="role">HUMAN</span><br>
+  <span class="small">Coins: <span id="coins">0</span></span><br>
+  <button id="leaveBtn" class="secondary hudbutton">MENU</button>
+ </div>
+
+ <div class="hudbox center">
+  ⏱ <span id="timer">5:00</span><br>
+  <span id="modeLabel" class="small">REGULAR MAP</span>
+ </div>
+
+ <div class="hudbox right">
+  🎃 <span id="infectedLabel">0 infected</span><br>
+  <span class="small">Bots: 10</span>
+ </div>
+
+ <div class="message" id="message">Avoid the furry!</div>
+
+ <div class="dpad">
+  <button data-move="up">▲</button>
+  <button data-move="left">◀</button>
+  <button data-move="down">▼</button>
+  <button data-move="right">▶</button>
+ </div>
+
+ <button id="actionBtn">TAG!</button>
+ <button id="sprintBtn">⚡ SPRINT</button>
 </div>
 
 <div id="end" class="screen hidden">
-  <div class="panel" id="endPanel">
-    <h1 id="endTitle">ROUND OVER</h1>
-    <p id="endText">Good game!</p>
-    <div class="stats">
-      <div class="stat">🪙 Coins: <b id="endCoins">0</b></div>
-      <div class="stat">🐾 Tagged: <b id="endTags">0</b></div>
-    </div>
-    <div class="buttons">
-      <button id="againBtn">PLAY AGAIN</button>
-      <button id="menuBtn" class="secondary">MAIN MENU</button>
-    </div>
+ <div class="panel" id="endPanel">
+  <h1 id="endTitle">ROUND OVER</h1>
+  <p id="endText">Good game!</p>
+  <p>🪙 Coins earned: <b id="earned">0</b></p>
+  <div class="buttons">
+   <button id="againBtn">PLAY AGAIN</button>
+   <button id="menuBtn" class="secondary">MAIN MENU</button>
   </div>
+ </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 (() => {
 const $ = id => document.getElementById(id);
-const SAVE = 'furryTagLocalTest_v1';
-const ROOMS = 'furryTagRooms_v1';
+const SAVE = 'infectionHalloweenSave_v1';
 
-let save = load(SAVE, {coins:0, skin:'classic'});
-let room = null;
-let roomMode = 'host';
+let saved = readSave();
+let map = 'regular';
+let role = 'human';
+let skinEquipped = !!saved.halloweenSkin;
 let game = null;
+let clock = null;
 let move = {up:false,down:false,left:false,right:false};
 let keys = {};
-let clock = null;
+let sprinting = false;
+let wheelSpinning = false;
 
-function load(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-  catch { return fallback; }
-}
-function store(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); }
-  catch {}
-}
-function rooms() { return load(ROOMS, {}); }
-function saveRooms(value) { store(ROOMS, value); }
-
-function codeGen() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i=0; i<6; i++) code += chars[Math.floor(Math.random()*chars.length)];
-  return code;
-}
-
-function showRoom(mode) {
-  roomMode = mode;
-  $('roomArea').classList.remove('hidden');
-  $('garageArea').classList.add('hidden');
-  $('roomTitle').textContent = mode === 'host' ? 'Host a Match' : 'Join a Match';
-  $('roomExplain').textContent = mode === 'host'
-    ? 'Your room code is saved in this browser for this test.'
-    : 'Enter a room code created in this same browser.';
-  $('joinCode').classList.toggle('hidden', mode !== 'join');
-  $('copyBtn').classList.toggle('hidden', mode !== 'host');
-  $('startRoomBtn').textContent = mode === 'host' ? 'START MATCH' : 'JOIN THIS ROOM';
-  $('roomStatus').textContent = '';
-  $('roomDetails').textContent = '';
-
-  if (mode === 'host') {
-    const all = rooms();
-    let code = codeGen();
-    while (all[code]) code = codeGen();
-    room = {code,host:'You',created:Date.now(),bots:10,status:'Waiting'};
-    all[code] = room;
-    saveRooms(all);
-    $('roomCode').textContent = code;
-    $('roomDetails').textContent = 'Host: You • Bots: 10 • Round: 5 minutes';
-  } else {
-    $('roomCode').textContent = '??????';
-    $('roomDetails').textContent = 'LocalStorage only — same browser/device';
+function readSave() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVE)) ||
+      {coins:0,halloweenSkin:false};
+  } catch {
+    return {coins:0,halloweenSkin:false};
   }
 }
 
-function menu() {
-  clearInterval(clock);
-  clock = null;
-  game?.dispose?.();
-  game = null;
-  $('scene').style.display = 'none';
-  $('hud').style.display = 'none';
-  $('end').classList.add('hidden');
-  $('menu').style.display = 'flex';
-  $('roomArea').classList.add('hidden');
-  $('garageArea').classList.add('hidden');
-  room = null;
+function save() {
+  try {
+    localStorage.setItem(SAVE,JSON.stringify(saved));
+  } catch {}
 }
 
-$('hostBtn').onclick = () => showRoom('host');
-$('joinBtn').onclick = () => showRoom('join');
-$('closeRoomBtn').onclick = () => {
-  $('roomArea').classList.add('hidden');
-  room = null;
+function chooseMap(which) {
+  map = which;
+  $('regularMap').classList.toggle('selected',map==='regular');
+  $('halloweenMap').classList.toggle('selected',map==='halloween');
+
+  $('mapDescription').textContent = map==='regular'
+    ? 'Classic grassy arena, trees, and coin pickups.'
+    : 'Spooky limited-time map with pumpkins, haunted trees, purple fog, and candy pickups.';
+}
+
+$('regularMap').onclick = () => chooseMap('regular');
+$('halloweenMap').onclick = () => chooseMap('halloween');
+
+$('playBtn').onclick = () => {
+  $('mainMenu').classList.add('hidden');
+  $('skinPanel').classList.add('hidden');
+  $('wheelPanel').classList.remove('hidden');
+  drawWheel();
+  $('wheelResult').textContent = 'Ready to spin?';
+  $('spinBtn').classList.remove('hidden');
+  $('startBtn').classList.add('hidden');
 };
 
-$('refreshBtn').onclick = () => {
-  if (roomMode === 'host') {
-    const existing = rooms()[room?.code];
-    $('roomStatus').textContent = existing
-      ? 'Room is saved in this browser.'
-      : 'Room not found.';
-  } else {
-    const code = $('joinCode').value.trim().toUpperCase();
-    const found = rooms()[code];
-    $('roomCode').textContent = found ? code : 'NOT FOUND';
-    $('roomDetails').textContent = found
-      ? `Host: ${found.host} • Bots: ${found.bots} • Round: 5 minutes`
-      : 'No matching room found in this browser.';
-    $('roomStatus').textContent = found
-      ? 'Room found! Press JOIN THIS ROOM.'
-      : 'Try a code created on this same browser.';
+$('wheelBack').onclick = () => {
+  $('wheelPanel').classList.add('hidden');
+  $('mainMenu').classList.remove('hidden');
+};
+
+$('skinBtn').onclick = () => {
+  $('mainMenu').classList.add('hidden');
+  $('wheelPanel').classList.add('hidden');
+  $('skinPanel').classList.remove('hidden');
+  $('skinStatus').textContent = skinEquipped
+    ? 'Halloween Furry Skin equipped!'
+    : 'Skin available — equip it for your next round.';
+};
+
+$('skinBack').onclick = () => {
+  $('skinPanel').classList.add('hidden');
+  $('mainMenu').classList.remove('hidden');
+};
+
+$('equipSkin').onclick = () => {
+  skinEquipped = true;
+  saved.halloweenSkin = true;
+  save();
+  $('skinStatus').textContent = '🎃 Halloween Furry Skin equipped!';
+};
+
+function drawWheel(angle=0) {
+  const canvas = $('wheel');
+  const ctx = canvas.getContext('2d');
+  const cx=250, cy=250, radius=238;
+  ctx.clearRect(0,0,500,500);
+
+  const parts = [
+    {name:'HUMAN',color:'#8c68ff'},
+    {name:'FURRY',color:'#ff862b'}
+  ];
+
+  for(let i=0;i<2;i++) {
+    const start = angle + i*Math.PI;
+
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,radius,start,start+Math.PI);
+    ctx.closePath();
+    ctx.fillStyle=parts[i].color;
+    ctx.fill();
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=6;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(start+Math.PI/2);
+    ctx.fillStyle='#fff';
+    ctx.font='bold 38px system-ui';
+    ctx.textAlign='center';
+    ctx.fillText(parts[i].name,0,-120);
+    ctx.restore();
   }
-};
 
-$('copyBtn').onclick = () => {
-  const code = room?.code;
-  if (!code) return;
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(code)
-      .then(() => $('roomStatus').textContent = 'Code copied!')
-      .catch(() => $('roomStatus').textContent = 'Your code is ' + code);
-  } else {
-    $('roomStatus').textContent = 'Your code is ' + code;
-  }
-};
+  ctx.beginPath();
+  ctx.arc(cx,cy,42,0,Math.PI*2);
+  ctx.fillStyle='#241635';
+  ctx.fill();
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=5;
+  ctx.stroke();
 
-$('startRoomBtn').onclick = () => {
-  if (roomMode === 'host') {
-    if (!room) return;
-    startGame(room.code, true);
-  } else {
-    const code = $('joinCode').value.trim().toUpperCase();
-    const found = rooms()[code];
-    if (!found) {
-      $('roomStatus').textContent =
-        'Room not found. Host a match in this browser first.';
-      return;
+  ctx.fillStyle='#fff';
+  ctx.font='32px system-ui';
+  ctx.textAlign='center';
+  ctx.fillText('🎃',cx,cy+11);
+}
+
+$('spinBtn').onclick = () => {
+  if(wheelSpinning) return;
+
+  wheelSpinning = true;
+  $('spinBtn').disabled = true;
+
+  const furry = Math.random() < 0.5;
+  const result = furry ? 'furry' : 'human';
+  const start = performance.now();
+  const duration = 2600;
+  const initial = Math.random()*Math.PI*2;
+  const turns = 8+Math.random()*4;
+
+  function frame(now) {
+    const p = Math.min((now-start)/duration,1);
+    const ease = 1-Math.pow(1-p,4);
+
+    drawWheel(initial+turns*Math.PI*2*ease);
+
+    if(p<1) {
+      requestAnimationFrame(frame);
+    } else {
+      role=result;
+      wheelSpinning=false;
+      $('spinBtn').disabled=false;
+
+      $('wheelResult').textContent = furry
+        ? '🎃 You are a FURRY! Tag everyone!'
+        : '🧍 You are HUMAN! Survive the round!';
+
+      $('spinBtn').classList.add('hidden');
+      $('startBtn').classList.remove('hidden');
     }
-    room = found;
-    startGame(code, false);
   }
+
+  requestAnimationFrame(frame);
 };
 
-$('soloBtn').onclick = () => startGame('SOLO', true);
-
-$('garageBtn').onclick = () => {
-  $('roomArea').classList.add('hidden');
-  $('garageArea').classList.remove('hidden');
-  $('skinStatus').textContent = 'Selected skin: ' + save.skin;
-};
-$('garageBack').onclick = () => $('garageArea').classList.add('hidden');
-
-document.querySelectorAll('[data-skin]').forEach(button => {
-  button.onclick = () => {
-    save.skin = button.dataset.skin;
-    store(SAVE, save);
-    $('skinStatus').textContent = 'Selected skin: ' + save.skin + ' ✓';
-  };
-});
-
-$('helpBtn').onclick = () => alert(
-  'Host Match creates a room code stored in this browser. Join Match can find that code only in this same browser. LocalStorage cannot send the room to a friend’s separate device. Use Play with Bots for the full round.'
-);
+$('startBtn').onclick = () => startGame(role,map);
 
 $('leaveBtn').onclick = menu;
 $('menuBtn').onclick = menu;
-$('againBtn').onclick = () => startGame(game?.code || 'SOLO', true);
+$('againBtn').onclick = () => startGame(role,map);
 
-document.addEventListener('keydown', event => {
-  const key = event.key.toLowerCase();
-  keys[key] = true;
-  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(key)) {
+document.addEventListener('keydown',event => {
+  keys[event.key.toLowerCase()]=true;
+
+  if(['arrowup','arrowdown','arrowleft','arrowright',' ']
+    .includes(event.key.toLowerCase())) {
     event.preventDefault();
   }
-}, {passive:false});
+},{passive:false});
 
-document.addEventListener('keyup', event => keys[event.key.toLowerCase()] = false);
+document.addEventListener('keyup',event => {
+  keys[event.key.toLowerCase()]=false;
+});
 
 document.querySelectorAll('[data-move]').forEach(button => {
-  const direction = button.dataset.move;
-  button.addEventListener('pointerdown', event => {
+  const direction=button.dataset.move;
+
+  button.addEventListener('pointerdown',event => {
     event.preventDefault();
-    move[direction] = true;
+    move[direction]=true;
   });
+
   ['pointerup','pointercancel','pointerleave'].forEach(type => {
-    button.addEventListener(type, () => move[direction] = false);
+    button.addEventListener(type,() => move[direction]=false);
   });
 });
 
-$('actionBtn').onclick = () => { if (game) game.tag(); };
+$('sprintBtn').addEventListener('pointerdown',event => {
+  event.preventDefault();
+  sprinting=true;
+});
 
-function startGame(code, isHost) {
-  $('menu').style.display = 'none';
+['pointerup','pointercancel','pointerleave'].forEach(type => {
+  $('sprintBtn').addEventListener(type,() => sprinting=false);
+});
+
+$('actionBtn').onclick = () => game?.tag();
+
+function menu() {
+  clearInterval(clock);
+  clock=null;
+  game?.dispose();
+  game=null;
+
+  $('scene').style.display='none';
+  $('hud').style.display='none';
   $('end').classList.add('hidden');
-  $('scene').style.display = 'block';
-  $('hud').style.display = 'block';
-  $('hudCode').textContent = code;
-  $('coins').textContent = save.coins;
-  $('message').textContent = 'Avoid the infected! Use WASD or the arrows.';
-
-  if (typeof THREE === 'undefined') {
-    $('message').textContent = '3D library did not load. Check your internet connection.';
-    return;
-  }
-  game = createGame(code, isHost);
+  $('menu').style.display='flex';
+  $('mainMenu').classList.remove('hidden');
+  $('wheelPanel').classList.add('hidden');
+  $('skinPanel').classList.add('hidden');
 }
 
-function createGame(code, isHost) {
-  const root = $('scene');
-  root.innerHTML = '';
+function startGame(whichRole,whichMap) {
+  role=whichRole;
+  map=whichMap;
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x9acbff);
-  scene.fog = new THREE.Fog(0x9acbff, 35, 90);
+  $('menu').style.display='none';
+  $('end').classList.add('hidden');
+  $('scene').style.display='block';
+  $('hud').style.display='block';
 
-  const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, .1, 150);
-  const renderer = new THREE.WebGLRenderer({antialias:true});
+  $('role').textContent=role.toUpperCase();
+  $('coins').textContent=saved.coins;
+  $('modeLabel').textContent=map==='halloween'
+    ? '🎃 HALLOWEEN LIMITED'
+    : '🌳 REGULAR MAP';
+
+  $('message').textContent=role==='furry'
+    ? 'You are the furry! Tag the humans!'
+    : 'Avoid the furry!';
+
+  if(typeof THREE==='undefined') {
+    $('message').textContent='3D library failed to load. Check your internet connection.';
+    return;
+  }
+
+  game=createGame(whichRole,whichMap);
+}
+
+function createGame(whichRole,whichMap) {
+  const root=$('scene');
+  root.innerHTML='';
+
+  const halloween=whichMap==='halloween';
+
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(halloween?0x241336:0x9acbff);
+  scene.fog=new THREE.Fog(
+    halloween?0x241336:0x9acbff,
+    halloween?18:35,
+    90
+  );
+
+  const camera=new THREE.PerspectiveCamera(
+    70,innerWidth/innerHeight,.1,150
+  );
+
+  const renderer=new THREE.WebGLRenderer({antialias:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(innerWidth,innerHeight);
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled=true;
   root.appendChild(renderer.domElement);
 
-  scene.add(new THREE.HemisphereLight(0xdceaff,0x43503b,2));
-  const sun = new THREE.DirectionalLight(0xffffff,2.2);
+  scene.add(new THREE.HemisphereLight(
+    halloween?0xc5a4ff:0xdceaff,
+    halloween?0x28152c:0x43503b,
+    2
+  ));
+
+  const sun=new THREE.DirectionalLight(
+    halloween?0xffa24a:0xffffff,
+    2
+  );
   sun.position.set(-8,18,8);
-  sun.castShadow = true;
+  sun.castShadow=true;
   scene.add(sun);
 
-  const floor = new THREE.Mesh(
+  const floor=new THREE.Mesh(
     new THREE.PlaneGeometry(100,100),
-    new THREE.MeshStandardMaterial({color:0x4b985c,roughness:1})
+    new THREE.MeshStandardMaterial({
+      color:halloween?0x30233d:0x4b985c,
+      roughness:1
+    })
   );
-  floor.rotation.x = -Math.PI/2;
-  floor.receiveShadow = true;
+  floor.rotation.x=-Math.PI/2;
+  floor.receiveShadow=true;
   scene.add(floor);
 
-  const grid = new THREE.GridHelper(80,40,0x6dbb77,0x589a65);
-  grid.position.y = .02;
-  scene.add(grid);
+  if(!halloween) {
+    const grid=new THREE.GridHelper(80,40,0x6dbb77,0x589a65);
+    grid.position.y=.02;
+    scene.add(grid);
+  }
 
-  const mats = {human:0x4a8dff,furry:0xff78c8,infected:0xb45cff,bot:0xffbd4a};
+  function addEars(group,color,spooky=false) {
+    const material=new THREE.MeshStandardMaterial({color});
 
-  function actor(x,z,isPlayer,furry,skin='classic') {
-    const group = new THREE.Group();
+    for(const side of [-1,1]) {
+      const ear=new THREE.Mesh(
+        new THREE.ConeGeometry(.16,.48,8),
+        material
+      );
+      ear.position.set(side*.22,2.12,0);
+      ear.rotation.z=-side*.18;
+      group.add(ear);
+    }
+
+    const tail=new THREE.Mesh(
+      new THREE.ConeGeometry(.13,.62,8),
+      material
+    );
+    tail.rotation.x=Math.PI/2;
+    tail.position.set(0,.8,.48);
+    group.add(tail);
+
+    if(spooky) {
+      const glow=new THREE.PointLight(0xff7b20,1,3);
+      glow.position.y=1.6;
+      group.add(glow);
+    }
+  }
+
+  function actor(x,z,isPlayer,isFurry=false) {
+    const group=new THREE.Group();
     scene.add(group);
     group.position.set(x,0,z);
 
-    const color = isPlayer
-      ? ({classic:0x4a8dff,fox:0xff984f,cat:0xd5d8e8,neon:0x46f6e7}[skin] || mats.human)
-      : (furry ? mats.infected : mats.bot);
+    const spooky=halloween&&isFurry;
+    const color=isFurry
+      ? (spooky?0xff7a22:0xb45cff)
+      : (isPlayer?0x4a8dff:0xffbd4a);
 
-    const body = new THREE.Mesh(
+    const material=new THREE.MeshStandardMaterial({
+      color,
+      emissive:spooky?0x552000:0x000000,
+      roughness:.6
+    });
+
+    const body=new THREE.Mesh(
       new THREE.CapsuleGeometry(.42,.75,4,8),
-      new THREE.MeshStandardMaterial({color,roughness:.65})
+      material
     );
-    body.position.y = .88;
-    body.castShadow = true;
+    body.position.y=.88;
+    body.castShadow=true;
     group.add(body);
 
-    const head = new THREE.Mesh(
+    const head=new THREE.Mesh(
       new THREE.SphereGeometry(.37,16,12),
-      new THREE.MeshStandardMaterial({color,roughness:.6})
+      material
     );
-    head.position.y = 1.72;
-    head.castShadow = true;
+    head.position.y=1.72;
+    head.castShadow=true;
     group.add(head);
 
-    if (furry) addEars(group,color);
+    if(isFurry) addEars(group,color,spooky);
 
-    const ring = new THREE.Mesh(
+    const ring=new THREE.Mesh(
       new THREE.TorusGeometry(.48,.045,6,20),
-      new THREE.MeshBasicMaterial({color:furry?0xff64db:0x83f2ff})
+      new THREE.MeshBasicMaterial({
+        color:isFurry
+          ? (spooky?0xffa52b:0xff64db)
+          : 0x83f2ff
+      })
     );
-    ring.rotation.x = Math.PI/2;
-    ring.position.y = .08;
+    ring.rotation.x=Math.PI/2;
+    ring.position.y=.08;
     group.add(ring);
 
     return {
-      group,body,head,isPlayer,furry,alive:true,
-      speed:isPlayer?7:(2.2+Math.random()*1.4),color
+      group,
+      body,
+      head,
+      furry:isFurry,
+      speed:2.2+Math.random()*1.4
     };
   }
 
-  function addEars(group,color) {
-    const material = new THREE.MeshStandardMaterial({color});
-    for (const side of [-1,1]) {
-      const ear = new THREE.Mesh(new THREE.ConeGeometry(.16,.48,8),material);
-      ear.position.set(side*.22,2.12,0);
-      ear.rotation.z = -side*.18;
-      group.add(ear);
-    }
-    const tail = new THREE.Mesh(new THREE.ConeGeometry(.13,.62,8),material);
-    tail.rotation.x = Math.PI/2;
-    tail.position.set(0,.8,.48);
-    group.add(tail);
+  const player=actor(0,0,false);
+  player.speed=7;
+
+  let playerFurry=whichRole==='furry';
+
+  if(playerFurry) {
+    player.furry=true;
+    const color=halloween?0xff7a22:0xb45cff;
+    player.body.material.color.setHex(color);
+    player.head.material.color.setHex(color);
+    addEars(player.group,color,halloween&&skinEquipped);
   }
 
-  const player = actor(0,0,true,false,save.skin);
-  const bots = [];
+  const bots=[];
 
-  for (let i=0;i<10;i++) {
-    const angle = Math.random()*Math.PI*2;
-    const radius = 7+Math.random()*14;
+  for(let i=0;i<10;i++) {
+    const angle=Math.random()*Math.PI*2;
+    const radius=7+Math.random()*14;
+    const furry=whichRole==='human'&&i===0;
+
     bots.push(actor(
       Math.cos(angle)*radius,
       Math.sin(angle)*radius,
       false,
-      i===0
+      furry
     ));
   }
 
-  let playerFurry = false;
-  let infectedCount = 0;
-  let tags = 0;
-  let time = 300;
-  let coinsEarned = 0;
-  let ended = false;
-  let last = performance.now();
-  let raf = 0;
+  // Trees and spooky decorations
+  for(let i=0;i<20;i++) {
+    const x=(Math.random()-.5)*46;
+    const z=(Math.random()-.5)*46;
 
-  const obstacles = [];
-  for (let i=0;i<20;i++) {
-    const x = (Math.random()-.5)*46;
-    const z = (Math.random()-.5)*46;
-    if (Math.abs(x)<4 && Math.abs(z)<4) continue;
+    if(Math.abs(x)<4&&Math.abs(z)<4) continue;
 
-    const tree = new THREE.Group();
+    const tree=new THREE.Group();
     tree.position.set(x,0,z);
     scene.add(tree);
 
-    const trunk = new THREE.Mesh(
+    const trunk=new THREE.Mesh(
       new THREE.CylinderGeometry(.2,.28,1.6,7),
-      new THREE.MeshStandardMaterial({color:0x70452d})
+      new THREE.MeshStandardMaterial({
+        color:halloween?0x3d263e:0x70452d
+      })
     );
-    trunk.position.y = .8;
+    trunk.position.y=.8;
     tree.add(trunk);
 
-    const top = new THREE.Mesh(
-      new THREE.ConeGeometry(1.2,2.6,8),
+    const crown=new THREE.Mesh(
+      halloween
+        ? new THREE.SphereGeometry(1.15,8,8)
+        : new THREE.ConeGeometry(1.2,2.6,8),
       new THREE.MeshStandardMaterial({
-        color:[0x237b48,0x2c8d50,0x347b3f][i%3]
+        color:halloween
+          ? [0x4d285d,0x6e326e,0x342744][i%3]
+          : [0x237b48,0x2c8d50,0x347b3f][i%3]
       })
     );
-    top.position.y = 2.5;
-    top.castShadow = true;
-    tree.add(top);
-    obstacles.push({x,z,r:1.0});
+    crown.position.y=2.5;
+    tree.add(crown);
+
+    if(halloween&&i%3===0) {
+      const pumpkin=new THREE.Mesh(
+        new THREE.SphereGeometry(.55,12,10),
+        new THREE.MeshStandardMaterial({
+          color:0xff7a18,
+          emissive:0x552000
+        })
+      );
+      pumpkin.scale.y=.8;
+      pumpkin.position.set(x+.7,.5,z+.3);
+      scene.add(pumpkin);
+    }
   }
 
-  const pickups = [];
-  for (let i=0;i<12;i++) {
-    const pickup = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(.28,0),
+  // Coin pickups; Halloween mode uses orange candy-like pickups.
+  const pickups=[];
+
+  for(let i=0;i<14;i++) {
+    const pickup=new THREE.Mesh(
+      halloween
+        ? new THREE.SphereGeometry(.3,10,10)
+        : new THREE.IcosahedronGeometry(.28,0),
       new THREE.MeshStandardMaterial({
-        color:0xffdf55,emissive:0x5e3500,emissiveIntensity:.5
+        color:halloween?0xff8a21:0xffdf55,
+        emissive:halloween?0x542000:0x5e3500,
+        emissiveIntensity:.5
       })
     );
-    pickup.position.set((Math.random()-.5)*34,.65,(Math.random()-.5)*34);
+
+    pickup.position.set(
+      (Math.random()-.5)*34,
+      .65,
+      (Math.random()-.5)*34
+    );
+
     scene.add(pickup);
     pickups.push(pickup);
   }
 
-  function pos(actor) { return actor.group.position; }
+  let time=300;
+  let tags=0;
+  let earned=0;
+  let ended=false;
+  let last=performance.now();
+  let raf=0;
 
-  function furryify(actor) {
-    if (actor.furry) return;
-    actor.furry = true;
-    actor.body.material.color.setHex(mats.infected);
-    actor.head.material.color.setHex(mats.infected);
-    addEars(actor.group,mats.infected);
-    infectedCount++;
+  function pos(actor) {
+    return actor.group.position;
+  }
+
+  function turnFurry(actor) {
+    if(actor.furry) return;
+
+    actor.furry=true;
+    const color=halloween?0xff7a22:0xb45cff;
+
+    actor.body.material.color.setHex(color);
+    actor.head.material.color.setHex(color);
+    addEars(actor.group,color,halloween&&skinEquipped);
   }
 
   function tag() {
-    if (!playerFurry) {
-      $('message').textContent = 'You are not infected yet! Get tagged by a furry.';
+    if(!playerFurry) {
+      $('message').textContent='You are human! Run and survive!';
       return;
     }
 
-    let nearest = null;
-    let distance = 2.7;
+    let target=null;
+    let distance=2.7;
 
-    for (const bot of bots) {
-      if (!bot.alive || bot.furry) continue;
-      const d = pos(player).distanceTo(pos(bot));
-      if (d<distance) {
-        distance = d;
-        nearest = bot;
+    for(const bot of bots) {
+      if(bot.furry) continue;
+
+      const d=pos(player).distanceTo(pos(bot));
+
+      if(d<distance) {
+        target=bot;
+        distance=d;
       }
     }
 
-    if (nearest) {
-      furryify(nearest);
+    if(target) {
+      turnFurry(target);
       tags++;
-      $('message').textContent = 'Tagged a bot!';
-      $('roundInfo').textContent = 'Bots infected: ' + infectedCount;
+      earned+=10;
+      $('message').textContent='Tagged a bot! +10 coins';
     } else {
-      $('message').textContent = 'No human bot close enough to tag!';
+      $('message').textContent='Get closer to a human bot!';
     }
   }
 
-  function endRound(won,title) {
-    if (ended) return;
-    ended = true;
+  function finish(won,title) {
+    if(ended) return;
+
+    ended=true;
     cancelAnimationFrame(raf);
     clearInterval(clock);
 
-    coinsEarned += won ? 50 : 15;
-    save.coins += coinsEarned;
-    store(SAVE,save);
+    earned+=won?50:15;
+    saved.coins+=earned;
+    save();
 
-    $('endTitle').textContent = title;
-    $('endText').textContent = won ? 'Round complete! Great work.' : 'Round over! Try again.';
-    $('endCoins').textContent = coinsEarned;
-    $('endTags').textContent = tags;
-    $('hud').style.display = 'none';
+    $('endTitle').textContent=title;
+    $('endText').textContent=won
+      ? 'You won the round!'
+      : 'Round over — try again!';
+
+    $('earned').textContent=earned;
+    $('hud').style.display='none';
     $('end').classList.remove('hidden');
   }
 
   function update(dt) {
-    if (ended) return;
+    if(ended) return;
 
     let dx=0,dz=0;
-    dx += (keys.a||keys.arrowleft||move.left) ? -1 : 0;
-    dx += (keys.d||keys.arrowright||move.right) ? 1 : 0;
-    dz += (keys.w||keys.arrowup||move.up) ? -1 : 0;
-    dz += (keys.s||keys.arrowdown||move.down) ? 1 : 0;
 
-    const length = Math.hypot(dx,dz)||1;
-    pos(player).x += dx/length*player.speed*dt;
-    pos(player).z += dz/length*player.speed*dt;
-    pos(player).x = THREE.MathUtils.clamp(pos(player).x,-43,43);
-    pos(player).z = THREE.MathUtils.clamp(pos(player).z,-43,43);
+    dx+=(keys.a||keys.arrowleft||move.left)?-1:0;
+    dx+=(keys.d||keys.arrowright||move.right)?1:0;
+    dz+=(keys.w||keys.arrowup||move.up)?-1:0;
+    dz+=(keys.s||keys.arrowdown||move.down)?1:0;
 
-    for (const bot of bots) {
-      if (!bot.alive) continue;
-      const p = pos(bot), q = pos(player);
+    const length=Math.hypot(dx,dz)||1;
+
+    // Hold the sprint button for faster movement.
+    const speed=player.speed*(sprinting?1.65:1);
+
+    pos(player).x=THREE.MathUtils.clamp(
+      pos(player).x+dx/length*speed*dt,-43,43
+    );
+
+    pos(player).z=THREE.MathUtils.clamp(
+      pos(player).z+dz/length*speed*dt,-43,43
+    );
+
+    for(const bot of bots) {
+      const p=pos(bot);
+      const q=pos(player);
+
       let tx,tz;
 
-      if (bot.furry) {
-        tx=q.x; tz=q.z;
+      if(bot.furry) {
+        tx=q.x;
+        tz=q.z;
       } else {
         tx=p.x+Math.sin(performance.now()*.0007+p.z)*3;
         tz=p.z+Math.cos(performance.now()*.0008+p.x)*3;
       }
 
-      let vx=tx-p.x, vz=tz-p.z;
+      const vx=tx-p.x;
+      const vz=tz-p.z;
       const distance=Math.hypot(vx,vz)||1;
-      p.x += vx/distance*bot.speed*dt;
-      p.z += vz/distance*bot.speed*dt;
-      p.x = THREE.MathUtils.clamp(p.x,-44,44);
-      p.z = THREE.MathUtils.clamp(p.z,-44,44);
 
-      if (bot.furry && !playerFurry && p.distanceTo(q)<1.0) {
+      p.x=THREE.MathUtils.clamp(
+        p.x+vx/distance*bot.speed*dt,-44,44
+      );
+
+      p.z=THREE.MathUtils.clamp(
+        p.z+vz/distance*bot.speed*dt,-44,44
+      );
+
+      // A furry bot infects a human player by getting close.
+      if(bot.furry&&!playerFurry&&p.distanceTo(q)<1) {
         playerFurry=true;
-        furryify(player);
-        $('roleLabel').textContent='FURRY';
-        $('message').textContent='INFECTED! Tag the remaining humans!';
-        $('actionBtn').textContent='TAG!';
+        turnFurry(player);
+        $('role').textContent='FURRY';
+        $('message').textContent='INFECTED! Tag everyone!';
       }
 
-      if (!bot.furry && playerFurry && p.distanceTo(q)<1.5 && Math.random()<.009) {
-        furryify(bot);
+      // Player can infect nearby human bots by getting close.
+      if(!bot.furry&&playerFurry&&p.distanceTo(q)<1.4&&Math.random()<.01) {
+        turnFurry(bot);
       }
     }
 
-    for (let i=pickups.length-1;i>=0;i--) {
-      if (pos(player).distanceTo(pickups[i].position)<1.1) {
+    // Collect coins or Halloween candy.
+    for(let i=pickups.length-1;i>=0;i--) {
+      if(pos(player).distanceTo(pickups[i].position)<1.1) {
         scene.remove(pickups[i]);
         pickups.splice(i,1);
-        save.coins+=5;
-        coinsEarned+=5;
-        $('coins').textContent=save.coins;
+
+        earned+=5;
+        saved.coins+=5;
+        $('coins').textContent=saved.coins;
+        save();
       }
     }
 
     const q=pos(player);
-    camera.position.lerp(new THREE.Vector3(q.x,q.y+6,q.z+9),.09);
+
+    camera.position.lerp(
+      new THREE.Vector3(q.x,q.y+6,q.z+9),
+      .09
+    );
+
     camera.lookAt(q.x,q.y+1,q.z);
 
-    $('roundInfo').textContent = playerFurry
-      ? `Infected: ${bots.filter(b=>b.furry).length+1}/11`
-      : 'Survive until the timer ends';
+    const infected=bots.filter(bot=>bot.furry).length+(playerFurry?1:0);
+    $('infectedLabel').textContent=infected+' infected';
 
-    const humans = bots.filter(b=>b.alive&&!b.furry).length + (playerFurry?0:1);
-    if (playerFurry && humans===0) endRound(true,'ALL INFECTED!');
+    if(playerFurry&&bots.every(bot=>bot.furry)) {
+      finish(true,'ALL INFECTED!');
+    }
   }
 
   function animate(now) {
@@ -622,31 +809,34 @@ function createGame(code, isHost) {
     renderer.render(scene,camera);
   }
 
-  function onResize() {
+  function resize() {
     camera.aspect=innerWidth/innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
   }
 
-  addEventListener('resize',onResize);
+  addEventListener('resize',resize);
   animate(performance.now());
 
   clock=setInterval(()=>{
-    if (ended) return;
+    if(ended) return;
+
     time--;
-    const minutes=Math.floor(time/60);
-    const seconds=String(time%60).padStart(2,'0');
-    $('timer').textContent=minutes+':'+seconds;
-    if (time<=0) endRound(!playerFurry,'TIME UP!');
+
+    $('timer').textContent=
+      Math.floor(time/60)+':'+String(time%60).padStart(2,'0');
+
+    if(time<=0) {
+      finish(!playerFurry,'TIME UP!');
+    }
   },1000);
 
   return {
-    code,
     tag,
     dispose() {
       cancelAnimationFrame(raf);
       clearInterval(clock);
-      removeEventListener('resize',onResize);
+      removeEventListener('resize',resize);
       renderer.dispose();
       root.innerHTML='';
     }
