@@ -2,893 +2,656 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>BECOME A FURRY! 3D — Infection Tag</title>
 <style>
+:root{--bg:#101426;--panel:#1b2240;--purple:#9d75ff;--pink:#ff77c8;--cyan:#69e7ff;--text:#f7f5ff}
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#100e23;color:#fff;font-family:system-ui,Segoe UI,sans-serif}
-button{border:0;border-radius:12px;padding:12px 16px;color:white;background:linear-gradient(135deg,#a855f7,#6d28d9);font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 4px 0 #442077}
-button:disabled{opacity:.45}
-#scene{position:fixed;inset:0}
-#menu{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#473078dd,#100d20f5);padding:16px;overflow:auto}
-.card{width:min(700px,100%);background:#1b1630f2;border:1px solid #ffffff32;border-radius:24px;padding:clamp(18px,4vw,32px);box-shadow:0 20px 70px #0008}
-.logo{font-size:clamp(32px,7vw,60px);line-height:.95;font-weight:1000;letter-spacing:-2px}
-.logo span{color:#ffad49}
-.sub{color:#d6c8f2;line-height:1.5}
-.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
-.choice{background:#ffffff0b;border:1px solid #ffffff25;border-radius:16px;padding:16px;text-align:left;box-shadow:none}
-.choice .emoji{font-size:34px}
-.choice h3{margin:7px 0 4px}
-.choice p{font-size:13px;color:#d1c4e8;margin:0}
-.choice.selected{border:2px solid #d8b4fe;background:#6d28d933}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.row>*{flex:1}
-.muted{font-size:12px;color:#c9bbdf;line-height:1.5}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Arial,sans-serif;overflow:hidden}
+button,input{font:inherit}
+button{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #493c82}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #493c82}
+button.secondary{background:#343b61;box-shadow:0 4px 0 #202541}
+#scene{position:fixed;inset:0;display:none}
+canvas{display:block}
+.panel{background:rgba(20,25,49,.94);border:1px solid #55558a;border-radius:20px;padding:22px;box-shadow:0 16px 50px #0008;backdrop-filter:blur(8px)}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;background:radial-gradient(ellipse at top,#393267 0%,#171b35 48%,#101426 100%)}
+#menuPanel{width:min(620px,100%);text-align:center}
+h1{font-size:clamp(27px,6vw,48px);line-height:1.02;margin:0 0 10px;text-shadow:0 4px #3e286e}
+h2{margin:0 0 12px}
+.subtitle{color:#d3d5ff;margin-bottom:22px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wide{grid-column:1/-1}
+.small{font-size:13px;color:#c3c8ec;line-height:1.4}
 .hidden{display:none!important}
+.field{width:100%;padding:13px;border-radius:12px;border:2px solid #565d8b;background:#0e1328;color:white;margin:8px 0 12px;text-transform:uppercase}
+.roomcode{font-size:clamp(27px,7vw,40px);font-weight:1000;letter-spacing:5px;color:#80f2ff;background:#0e1328;border:1px dashed #80f2ff;border-radius:14px;padding:12px;margin:12px 0}
 #hud{position:fixed;inset:0;pointer-events:none;display:none}
-.panel{background:#171329d9;border:1px solid #ffffff35;border-radius:14px;padding:10px 14px;backdrop-filter:blur(6px);box-shadow:0 6px 20px #0004}
-#top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-#clock{font-size:32px;font-weight:1000}
-#role{font-weight:900}
-#info{text-align:right;font-size:13px;line-height:1.6}
-#notice{position:absolute;top:110px;left:50%;transform:translateX(-50%);font-weight:900;text-align:center;max-width:90vw}
-#bottom{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);text-align:center;width:min(600px,90vw);font-size:13px}
-#back{pointer-events:auto;position:absolute;top:90px;left:12px;padding:8px 11px;font-size:12px}
-#mobile{display:none;position:fixed;bottom:20px;left:15px;right:15px;justify-content:space-between;pointer-events:none}
-#pad{display:grid;grid-template-columns:46px 46px 46px;grid-template-rows:46px 46px 46px;gap:4px;pointer-events:auto}
-#pad button,#jump{background:#21183dcc;border:1px solid #ffffff55;box-shadow:none;padding:0;touch-action:none}
-#up{grid-column:2}
-#left{grid-column:1;grid-row:2}
-#down{grid-column:2;grid-row:2}
-#right{grid-column:3;grid-row:2}
-#jump{width:72px;height:72px;border-radius:50%;align-self:end}
-@media(max-width:650px){
- .choices{grid-template-columns:1fr}
- #mobile{display:flex}
- #bottom{bottom:128px}
- #clock{font-size:25px}
- #info{font-size:11px}
-}
+.hudbox{position:absolute;top:12px;background:#11172ddd;border:1px solid #62699a;border-radius:13px;padding:10px 13px;font-weight:800;pointer-events:auto}
+.left{left:12px}.right{right:12px;text-align:right}
+.center{top:12px;left:50%;transform:translateX(-50%);text-align:center}
+.hudbutton{padding:8px 11px;margin-top:5px}
+.message{position:absolute;top:80px;left:50%;transform:translateX(-50%);background:#161a34e8;padding:10px 14px;border-radius:12px;text-align:center;max-width:90%;font-weight:700}
+.controls{position:absolute;bottom:20px;left:18px;display:grid;grid-template-columns:repeat(3,52px);gap:5px;pointer-events:auto}
+.controls button{padding:9px;background:#222b50dd;box-shadow:none;border:1px solid #7880b0;font-size:18px}
+.controls button:nth-child(1){grid-column:2}
+.controls button:nth-child(2){grid-column:1;grid-row:2}
+.controls button:nth-child(3){grid-column:2;grid-row:2}
+.controls button:nth-child(4){grid-column:3;grid-row:2}
+#actionBtn{position:absolute;bottom:32px;right:20px;pointer-events:auto;border-radius:50%;width:82px;height:82px;padding:5px;background:linear-gradient(135deg,#ff7dc8,#9d75ff)}
+#endPanel{width:min(520px,100%);text-align:center}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.stat{background:#0d132a;padding:10px 14px;border-radius:12px}
+@media(min-width:800px){.controls{bottom:24px;left:24px}.message{top:92px}}
 </style>
 </head>
 <body>
-
 <div id="scene"></div>
 
-<div id="menu">
-  <div class="card" id="home">
-    <div class="logo">
-      BECOME A <span>FURRY!</span><br>
-      <span style="color:#c4b5fd;font-size:.68em">INFECTION TAG 3D</span>
+<div id="menu" class="screen">
+  <div id="menuPanel" class="panel">
+    <h1>🐾 BECOME A FURRY! 3D</h1>
+    <div class="subtitle">INFECTION TAG • BOT & ROOM-CODE TEST</div>
+
+    <div class="buttons">
+      <button id="soloBtn" class="wide">▶ PLAY WITH BOTS</button>
+      <button id="hostBtn">🏠 HOST MATCH</button>
+      <button id="joinBtn">🔑 JOIN MATCH</button>
+      <button id="garageBtn" class="secondary">🎨 SKINS</button>
+      <button id="helpBtn" class="secondary">❔ HOW IT WORKS</button>
     </div>
 
-    <p class="sub">
-      Run, hide, and survive. One furry starts as the tagger.
-      If they touch you, you transform and join the chase!
+    <div id="roomArea" class="hidden" style="margin-top:18px;text-align:left">
+      <h2 id="roomTitle">Room</h2>
+      <div class="small" id="roomExplain"></div>
+      <div id="roomCode" class="roomcode">------</div>
+      <div class="small" id="roomDetails"></div>
+
+      <input id="joinCode" class="field hidden" maxlength="6"
+        placeholder="ENTER 6-CHARACTER CODE" autocomplete="off">
+
+      <div class="buttons">
+        <button id="copyBtn" class="secondary">📋 COPY CODE</button>
+        <button id="refreshBtn" class="secondary">↻ REFRESH LOBBY</button>
+        <button id="startRoomBtn" class="wide">START MATCH</button>
+        <button id="closeRoomBtn" class="wide secondary">BACK TO MENU</button>
+      </div>
+      <p id="roomStatus" class="small"></p>
+    </div>
+
+    <div id="garageArea" class="hidden" style="margin-top:18px">
+      <h2>Skin Garage</h2>
+      <p class="small">Choose your look. These choices save on this browser.</p>
+      <div class="buttons">
+        <button data-skin="classic" class="secondary">🐺 Classic</button>
+        <button data-skin="fox" class="secondary">🦊 Fox</button>
+        <button data-skin="cat" class="secondary">🐱 Cat</button>
+        <button data-skin="neon" class="secondary">✨ Neon</button>
+        <button id="garageBack" class="wide">BACK</button>
+      </div>
+      <p id="skinStatus" class="small"></p>
+    </div>
+
+    <p class="small" style="margin:18px 0 0">
+      LocalStorage test: room data is stored only in this browser.
+      It does not connect separate devices.
     </p>
-
-    <div class="choices">
-      <button class="choice selected" id="bots">
-        <div class="emoji">🤖🐺</div>
-        <h3>Play with Bots</h3>
-        <p>Play against AI characters in a 3D arena.</p>
-      </button>
-
-      <button class="choice" id="online">
-        <div class="emoji">🌐👥</div>
-        <h3>Random Lobby</h3>
-        <p>This version focuses on single-player bot matches.</p>
-      </button>
-    </div>
-
-    <div id="onlinePanel" class="hidden">
-      <p id="onlineStatus" class="muted">
-        This version uses bots and does not require a multiplayer server.
-      </p>
-    </div>
-
-    <div class="row" style="margin-top:15px">
-      <button id="start">▶ START BOT ROUND</button>
-      <button id="skins">🎭 SKINS & COINS</button>
-    </div>
-
-    <p class="muted">
-      Controls: WASD to move · Mouse to look · Shift to sprint.
-      Mobile: on-screen controls. Humans win if anyone survives;
-      furries win if everyone transforms.
-    </p>
-    <p class="muted">🍬 Candy: <b id="coinshop">0</b></p>
-  </div>
-
-  <div class="card hidden" id="garage">
-    <div class="logo" style="font-size:36px">FURRY <span>GARAGE</span></div>
-    <p class="sub">Choose your furry look.</p>
-    <div id="skinlist" class="choices"></div>
-    <div class="row">
-      <b>🍬 Candy: <span id="garageCoins">0</span></b>
-      <button id="back">← BACK</button>
-    </div>
-  </div>
-
-  <div class="card hidden" id="end">
-    <div class="logo" id="endtitle">ROUND OVER</div>
-    <p class="sub" id="endtext"></p>
-    <div class="row">
-      <button id="again">↻ PLAY AGAIN</button>
-      <button id="endhome">⌂ LOBBY</button>
-    </div>
   </div>
 </div>
 
 <div id="hud">
-  <div id="top">
-    <div class="panel">
-      <div id="clock">5:00</div>
-      <div id="role">HUMAN SURVIVOR</div>
-    </div>
-
-    <div class="panel" id="info">
-      🧍 Humans: <b id="humans">10</b><br>
-      🐺 Furries: <b id="furries">1</b><br>
-      🍬 Candy: <b id="coins">0</b><br>
-      <span id="roomLabel">BOT LOBBY</span>
-    </div>
+  <div class="hudbox left">
+    🐾 <span id="roleLabel">HUMAN</span><br>
+    <span class="small">Coins: <span id="coins">0</span></span><br>
+    <button id="leaveBtn" class="secondary hudbutton">LEAVE</button>
   </div>
-
-  <button id="leave" style="position:absolute;top:100px;left:12px;pointer-events:auto">← LOBBY</button>
-  <div id="notice">Avoid the furry tagger!</div>
-  <div id="bottom" class="panel">WASD move · Mouse look · Shift sprint</div>
+  <div class="hudbox center">
+    ⏱ <span id="timer">5:00</span><br>
+    <span class="small" id="roundInfo">Find a way to survive!</span>
+  </div>
+  <div class="hudbox right">
+    Room: <span id="hudCode">SOLO</span><br>
+    <span class="small">Bots: <span id="botCount">10</span></span>
+  </div>
+  <div class="message" id="message">Avoid the infected!</div>
+  <div class="controls">
+    <button data-move="up">▲</button>
+    <button data-move="left">◀</button>
+    <button data-move="down">▼</button>
+    <button data-move="right">▶</button>
+  </div>
+  <button id="actionBtn">TAG!</button>
 </div>
 
-<div id="mobile">
-  <div id="pad">
-    <button id="up" data-key="w">▲</button>
-    <button id="left" data-key="a">◀</button>
-    <button id="down" data-key="s">▼</button>
-    <button id="right" data-key="d">▶</button>
+<div id="end" class="screen hidden">
+  <div class="panel" id="endPanel">
+    <h1 id="endTitle">ROUND OVER</h1>
+    <p id="endText">Good game!</p>
+    <div class="stats">
+      <div class="stat">🪙 Coins: <b id="endCoins">0</b></div>
+      <div class="stat">🐾 Tagged: <b id="endTags">0</b></div>
+    </div>
+    <div class="buttons">
+      <button id="againBtn">PLAY AGAIN</button>
+      <button id="menuBtn" class="secondary">MAIN MENU</button>
+    </div>
   </div>
-  <button id="jump">SPRINT</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 (() => {
-"use strict";
-
 const $ = id => document.getElementById(id);
+const SAVE = 'furryTagLocalTest_v1';
+const ROOMS = 'furryTagRooms_v1';
 
-const skinData = [
-  ["fox", "🦊 Fox", 0, 0xff9b45],
-  ["wolf", "🐺 Moon Wolf", 80, 0xa9b6d8],
-  ["cat", "🐱 Night Cat", 140, 0xb7a0ff],
-  ["tiger", "🐯 Tiger", 220, 0xffb02e],
-  ["dragon", "🐲 Dragon", 400, 0x63e0a2],
-  ["rainbow", "🌈 Rainbow", 650, 0xff7bd5]
-];
+let save = load(SAVE, {coins:0, skin:'classic'});
+let room = null;
+let roomMode = 'host';
+let game = null;
+let move = {up:false,down:false,left:false,right:false};
+let keys = {};
+let clock = null;
 
-let coins = 0;
-let owned = ["fox"];
-let equipped = "fox";
+function load(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+  catch { return fallback; }
+}
+function store(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); }
+  catch {}
+}
+function rooms() { return load(ROOMS, {}); }
+function saveRooms(value) { store(ROOMS, value); }
 
-try {
-  coins = Number(localStorage.getItem("bf3dCoins") || 0);
-  owned = JSON.parse(localStorage.getItem("bf3dOwned") || '["fox"]');
-  equipped = localStorage.getItem("bf3dEquipped") || "fox";
-} catch (e) {}
-
-let scene, camera, renderer, clock;
-let actors = [], candies = [];
-let player = null;
-let playing = false, gameOver = false;
-let roundTime = 300, roundEarn = 0;
-let keys = {}, yaw = 0, mouseDown = false;
-let lastPointer = {x:0,y:0};
-
-const currentSkinColor = () =>
-  (skinData.find(s => s[0] === equipped) || skinData[0])[3];
-
-function save() {
-  try {
-    localStorage.setItem("bf3dCoins", coins);
-    localStorage.setItem("bf3dOwned", JSON.stringify(owned));
-    localStorage.setItem("bf3dEquipped", equipped);
-  } catch (e) {}
-  syncCoins();
+function codeGen() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i=0; i<6; i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
 }
 
-function syncCoins() {
-  $("coins").textContent = coins;
-  $("coinshop").textContent = coins;
-  $("garageCoins").textContent = coins;
+function showRoom(mode) {
+  roomMode = mode;
+  $('roomArea').classList.remove('hidden');
+  $('garageArea').classList.add('hidden');
+  $('roomTitle').textContent = mode === 'host' ? 'Host a Match' : 'Join a Match';
+  $('roomExplain').textContent = mode === 'host'
+    ? 'Your room code is saved in this browser for this test.'
+    : 'Enter a room code created in this same browser.';
+  $('joinCode').classList.toggle('hidden', mode !== 'join');
+  $('copyBtn').classList.toggle('hidden', mode !== 'host');
+  $('startRoomBtn').textContent = mode === 'host' ? 'START MATCH' : 'JOIN THIS ROOM';
+  $('roomStatus').textContent = '';
+  $('roomDetails').textContent = '';
+
+  if (mode === 'host') {
+    const all = rooms();
+    let code = codeGen();
+    while (all[code]) code = codeGen();
+    room = {code,host:'You',created:Date.now(),bots:10,status:'Waiting'};
+    all[code] = room;
+    saveRooms(all);
+    $('roomCode').textContent = code;
+    $('roomDetails').textContent = 'Host: You • Bots: 10 • Round: 5 minutes';
+  } else {
+    $('roomCode').textContent = '??????';
+    $('roomDetails').textContent = 'LocalStorage only — same browser/device';
+  }
 }
 
-function material(color, roughness=.85) {
-  return new THREE.MeshStandardMaterial({color, roughness});
+function menu() {
+  clearInterval(clock);
+  clock = null;
+  game?.dispose?.();
+  game = null;
+  $('scene').style.display = 'none';
+  $('hud').style.display = 'none';
+  $('end').classList.add('hidden');
+  $('menu').style.display = 'flex';
+  $('roomArea').classList.add('hidden');
+  $('garageArea').classList.add('hidden');
+  room = null;
 }
 
-function setup3D() {
-  if (!window.THREE) {
-    $("onlineStatus").textContent =
-      "Could not load the 3D engine. Check your internet connection and refresh.";
+$('hostBtn').onclick = () => showRoom('host');
+$('joinBtn').onclick = () => showRoom('join');
+$('closeRoomBtn').onclick = () => {
+  $('roomArea').classList.add('hidden');
+  room = null;
+};
+
+$('refreshBtn').onclick = () => {
+  if (roomMode === 'host') {
+    const existing = rooms()[room?.code];
+    $('roomStatus').textContent = existing
+      ? 'Room is saved in this browser.'
+      : 'Room not found.';
+  } else {
+    const code = $('joinCode').value.trim().toUpperCase();
+    const found = rooms()[code];
+    $('roomCode').textContent = found ? code : 'NOT FOUND';
+    $('roomDetails').textContent = found
+      ? `Host: ${found.host} • Bots: ${found.bots} • Round: 5 minutes`
+      : 'No matching room found in this browser.';
+    $('roomStatus').textContent = found
+      ? 'Room found! Press JOIN THIS ROOM.'
+      : 'Try a code created on this same browser.';
+  }
+};
+
+$('copyBtn').onclick = () => {
+  const code = room?.code;
+  if (!code) return;
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(code)
+      .then(() => $('roomStatus').textContent = 'Code copied!')
+      .catch(() => $('roomStatus').textContent = 'Your code is ' + code);
+  } else {
+    $('roomStatus').textContent = 'Your code is ' + code;
+  }
+};
+
+$('startRoomBtn').onclick = () => {
+  if (roomMode === 'host') {
+    if (!room) return;
+    startGame(room.code, true);
+  } else {
+    const code = $('joinCode').value.trim().toUpperCase();
+    const found = rooms()[code];
+    if (!found) {
+      $('roomStatus').textContent =
+        'Room not found. Host a match in this browser first.';
+      return;
+    }
+    room = found;
+    startGame(code, false);
+  }
+};
+
+$('soloBtn').onclick = () => startGame('SOLO', true);
+
+$('garageBtn').onclick = () => {
+  $('roomArea').classList.add('hidden');
+  $('garageArea').classList.remove('hidden');
+  $('skinStatus').textContent = 'Selected skin: ' + save.skin;
+};
+$('garageBack').onclick = () => $('garageArea').classList.add('hidden');
+
+document.querySelectorAll('[data-skin]').forEach(button => {
+  button.onclick = () => {
+    save.skin = button.dataset.skin;
+    store(SAVE, save);
+    $('skinStatus').textContent = 'Selected skin: ' + save.skin + ' ✓';
+  };
+});
+
+$('helpBtn').onclick = () => alert(
+  'Host Match creates a room code stored in this browser. Join Match can find that code only in this same browser. LocalStorage cannot send the room to a friend’s separate device. Use Play with Bots for the full round.'
+);
+
+$('leaveBtn').onclick = menu;
+$('menuBtn').onclick = menu;
+$('againBtn').onclick = () => startGame(game?.code || 'SOLO', true);
+
+document.addEventListener('keydown', event => {
+  const key = event.key.toLowerCase();
+  keys[key] = true;
+  if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(key)) {
+    event.preventDefault();
+  }
+}, {passive:false});
+
+document.addEventListener('keyup', event => keys[event.key.toLowerCase()] = false);
+
+document.querySelectorAll('[data-move]').forEach(button => {
+  const direction = button.dataset.move;
+  button.addEventListener('pointerdown', event => {
+    event.preventDefault();
+    move[direction] = true;
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(type => {
+    button.addEventListener(type, () => move[direction] = false);
+  });
+});
+
+$('actionBtn').onclick = () => { if (game) game.tag(); };
+
+function startGame(code, isHost) {
+  $('menu').style.display = 'none';
+  $('end').classList.add('hidden');
+  $('scene').style.display = 'block';
+  $('hud').style.display = 'block';
+  $('hudCode').textContent = code;
+  $('coins').textContent = save.coins;
+  $('message').textContent = 'Avoid the infected! Use WASD or the arrows.';
+
+  if (typeof THREE === 'undefined') {
+    $('message').textContent = '3D library did not load. Check your internet connection.';
     return;
   }
+  game = createGame(code, isHost);
+}
 
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x9bd8f3);
-  scene.fog = new THREE.Fog(0x9bd8f3, 35, 95);
+function createGame(code, isHost) {
+  const root = $('scene');
+  root.innerHTML = '';
 
-  camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, .1, 200);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9acbff);
+  scene.fog = new THREE.Fog(0x9acbff, 35, 90);
 
-  renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.8));
-  renderer.setSize(innerWidth, innerHeight);
+  const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, .1, 150);
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  $("scene").appendChild(renderer.domElement);
+  root.appendChild(renderer.domElement);
 
-  scene.add(new THREE.HemisphereLight(0xe1f6ff, 0x355039, 2.2));
-
-  const sun = new THREE.DirectionalLight(0xffe0b2, 2.8);
-  sun.position.set(-12,24,14);
+  scene.add(new THREE.HemisphereLight(0xdceaff,0x43503b,2));
+  const sun = new THREE.DirectionalLight(0xffffff,2.2);
+  sun.position.set(-8,18,8);
   sun.castShadow = true;
   scene.add(sun);
 
-  const ground = new THREE.Mesh(
+  const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(100,100),
-    material(0x4eae68)
+    new THREE.MeshStandardMaterial({color:0x4b985c,roughness:1})
   );
-  ground.rotation.x = -Math.PI/2;
-  ground.receiveShadow = true;
-  scene.add(ground);
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+  scene.add(floor);
 
-  const pathMaterial = material(0xd7b58b);
+  const grid = new THREE.GridHelper(80,40,0x6dbb77,0x589a65);
+  grid.position.y = .02;
+  scene.add(grid);
 
-  function makePath(x,z,w,d) {
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(w,.08,d),
-      pathMaterial
+  const mats = {human:0x4a8dff,furry:0xff78c8,infected:0xb45cff,bot:0xffbd4a};
+
+  function actor(x,z,isPlayer,furry,skin='classic') {
+    const group = new THREE.Group();
+    scene.add(group);
+    group.position.set(x,0,z);
+
+    const color = isPlayer
+      ? ({classic:0x4a8dff,fox:0xff984f,cat:0xd5d8e8,neon:0x46f6e7}[skin] || mats.human)
+      : (furry ? mats.infected : mats.bot);
+
+    const body = new THREE.Mesh(
+      new THREE.CapsuleGeometry(.42,.75,4,8),
+      new THREE.MeshStandardMaterial({color,roughness:.65})
     );
-    mesh.position.set(x,.035,z);
-    mesh.receiveShadow = true;
-    scene.add(mesh);
+    body.position.y = .88;
+    body.castShadow = true;
+    group.add(body);
+
+    const head = new THREE.Mesh(
+      new THREE.SphereGeometry(.37,16,12),
+      new THREE.MeshStandardMaterial({color,roughness:.6})
+    );
+    head.position.y = 1.72;
+    head.castShadow = true;
+    group.add(head);
+
+    if (furry) addEars(group,color);
+
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(.48,.045,6,20),
+      new THREE.MeshBasicMaterial({color:furry?0xff64db:0x83f2ff})
+    );
+    ring.rotation.x = Math.PI/2;
+    ring.position.y = .08;
+    group.add(ring);
+
+    return {
+      group,body,head,isPlayer,furry,alive:true,
+      speed:isPlayer?7:(2.2+Math.random()*1.4),color
+    };
   }
 
-  makePath(0,0,8,82);
-  makePath(0,0,82,7);
-  makePath(-18,-17,4,24);
-  makePath(17,16,4,24);
-
-  // Purple perimeter fence
-  const fenceMaterial = material(0x7351a6);
-
-  for (let v=-48; v<=48; v+=4) {
-    for (const z of [-48,48]) {
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(3,1.25,.3),
-        fenceMaterial
-      );
-      mesh.position.set(v,.62,z);
-      scene.add(mesh);
-    }
-
-    for (const x of [-48,48]) {
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(.3,1.25,3),
-        fenceMaterial
-      );
-      mesh.position.set(x,.62,v);
-      scene.add(mesh);
-    }
-  }
-
-  // Fountain
-  const stone = material(0x8f9fbf);
-  const water = new THREE.MeshStandardMaterial({
-    color:0x35c7ed, metalness:.25, roughness:.2
-  });
-
-  function cylinder(top,bottom,height,x,y,z,mat) {
-    const mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(top,bottom,height,28),mat
-    );
-    mesh.position.set(x,y,z);
-    mesh.castShadow = true;
-    scene.add(mesh);
-    return mesh;
-  }
-
-  cylinder(4.4,4.8,.65,12,.32,-12,stone);
-  cylinder(3.7,3.7,.12,12,.72,-12,water);
-  cylinder(.6,.9,2.8,12,2.1,-12,stone);
-  cylinder(2.1,1.1,.45,12,3.5,-12,stone);
-
-  const orb = new THREE.Mesh(
-    new THREE.SphereGeometry(.48,16,12),water
-  );
-  orb.position.set(12,4,-12);
-  scene.add(orb);
-
-  // Trees
-  for (let i=0; i<58; i++) {
-    const x = (Math.sin(i*91.7)*.5+.5)*84-42;
-    const z = (Math.cos(i*53.1)*.5+.5)*84-42;
-
-    if (Math.abs(x)<5 || Math.abs(z)<5 ||
-        Math.hypot(x-12,z+12)<7) continue;
-
-    const trunk = new THREE.Mesh(
-      new THREE.CylinderGeometry(.22,.38,2.2,7),
-      material(0x70482f)
-    );
-    trunk.position.set(x,1.1,z);
-    trunk.castShadow = true;
-    scene.add(trunk);
-
-    const crown = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.7+(i%3)*.2,1),
-      material([0x23754c,0x2c8b55,0x347b6a][i%3])
-    );
-    crown.position.set(x,3,z);
-    crown.castShadow = true;
-    scene.add(crown);
-  }
-
-  // Lanterns
-  for (let i=0; i<18; i++) {
-    const x=(i%6)*9-23;
-    const z=Math.floor(i/6)*15-20;
-
-    const post=new THREE.Mesh(
-      new THREE.CylinderGeometry(.12,.18,2.5,8),
-      material(0x5d4437)
-    );
-    post.position.set(x,1.25,z);
-    scene.add(post);
-
-    const lamp=new THREE.Mesh(
-      new THREE.SphereGeometry(.25,12,10),
-      new THREE.MeshStandardMaterial({
-        color:0xffc65c,
-        emissive:0xff9c24,
-        emissiveIntensity:1.5
-      })
-    );
-    lamp.position.set(x,2.6,z);
-    scene.add(lamp);
-  }
-}
-
-function makeActor(x,z,isHuman,isPlayer=false,name="Bot") {
-  const root = new THREE.Group();
-  root.position.set(x,0,z);
-  scene.add(root);
-
-  const bodyMat = material(
-    isHuman ? (isPlayer ? 0x318ddd : 0x39425a) : currentSkinColor()
-  );
-  const headMat = material(isHuman ? 0xffd0a9 : currentSkinColor());
-
-  const body = new THREE.Mesh(
-    new THREE.BoxGeometry(.78,1.05,.5),bodyMat
-  );
-  body.position.y=1.05;
-  body.castShadow=true;
-  root.add(body);
-
-  const head = new THREE.Mesh(
-    new THREE.SphereGeometry(.4,16,12),headMat
-  );
-  head.position.y=1.88;
-  head.castShadow=true;
-  root.add(head);
-
-  if (!isHuman) {
+  function addEars(group,color) {
+    const material = new THREE.MeshStandardMaterial({color});
     for (const side of [-1,1]) {
-      const ear=new THREE.Mesh(
-        new THREE.ConeGeometry(.19,.5,8),headMat
-      );
-      ear.position.set(side*.24,2.35,.01);
-      ear.rotation.z=-side*.2;
-      root.add(ear);
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(.16,.48,8),material);
+      ear.position.set(side*.22,2.12,0);
+      ear.rotation.z = -side*.18;
+      group.add(ear);
     }
-
-    const muzzle=new THREE.Mesh(
-      new THREE.SphereGeometry(.2,12,8),
-      material(0xffe8ec)
-    );
-    muzzle.scale.set(1,.65,.8);
-    muzzle.position.set(0,1.82,.34);
-    root.add(muzzle);
-
-    const tail=new THREE.Mesh(
-      new THREE.ConeGeometry(.2,.8,8),headMat
-    );
-    tail.position.set(0,.85,-.55);
-    tail.rotation.x=-1.1;
-    root.add(tail);
-  } else {
-    const hair=new THREE.Mesh(
-      new THREE.SphereGeometry(.42,12,8),
-      material(0x50382f)
-    );
-    hair.scale.y=.48;
-    hair.position.set(0,2.1,0);
-    root.add(hair);
+    const tail = new THREE.Mesh(new THREE.ConeGeometry(.13,.62,8),material);
+    tail.rotation.x = Math.PI/2;
+    tail.position.set(0,.8,.48);
+    group.add(tail);
   }
 
-  for (const side of [-1,1]) {
-    const leg=new THREE.Mesh(
-      new THREE.BoxGeometry(.25,.65,.3),bodyMat
-    );
-    leg.position.set(side*.21,.34,0);
-    root.add(leg);
-  }
-
-  const marker=new THREE.Mesh(
-    new THREE.SphereGeometry(.1,8,8),
-    new THREE.MeshBasicMaterial({
-      color:isHuman ? 0x54e4ff : 0xff428b
-    })
-  );
-  marker.position.y=2.65;
-  root.add(marker);
-
-  return {
-    root,
-    human:isHuman,
-    isPlayer,
-    name,
-    speed:isPlayer?7:2.6+Math.random()*1.1,
-    tagCooldown:0,
-    ai:Math.random(),
-    target:null,
-    marker
-  };
-}
-
-function clearRound() {
-  for (const actor of actors) scene.remove(actor.root);
-  actors=[];
-  for (const candy of candies) scene.remove(candy.mesh);
-  candies=[];
-}
-
-function spawnCandy() {
-  const mesh=new THREE.Mesh(
-    new THREE.OctahedronGeometry(.3),
-    new THREE.MeshStandardMaterial({
-      color:0xffd34f,
-      emissive:0xffa51d,
-      emissiveIntensity:.75
-    })
-  );
-
-  mesh.position.set(Math.random()*68-34,.7,Math.random()*68-34);
-  scene.add(mesh);
-  candies.push({mesh,alive:true,phase:Math.random()*6});
-}
-
-function startRound() {
-  if (!scene) return;
-
-  clearRound();
-  playing=true;
-  gameOver=false;
-  roundTime=300;
-  roundEarn=0;
-  keys={};
-
-  // Random role: the player is either the furry or a human.
-  const playerIsFurry=Math.random()<.5;
-
-  player=makeActor(0,12,!playerIsFurry,true,"YOU");
-  actors.push(player);
-
-  const names=[
-    "Milo","Pip","Sunny","Clover","Bean",
-    "Skye","Maple","River","Ash","Peach"
-  ];
+  const player = actor(0,0,true,false,save.skin);
+  const bots = [];
 
   for (let i=0;i<10;i++) {
-    actors.push(makeActor(
-      Math.random()*36-18,
-      Math.random()*36-18,
-      true,false,names[i]
+    const angle = Math.random()*Math.PI*2;
+    const radius = 7+Math.random()*14;
+    bots.push(actor(
+      Math.cos(angle)*radius,
+      Math.sin(angle)*radius,
+      false,
+      i===0
     ));
   }
 
-  if (playerIsFurry) {
-    player.human=false;
-    player.root.children.forEach((obj,i)=>{
-      if (obj.material && obj.material.color && i<3)
-        obj.material.color.set(currentSkinColor());
-    });
-    player.marker.material.color.set(0xff3c9d);
-    $("notice").textContent="YOU ARE THE FURRY! TAG ALL 10 HUMANS!";
-  } else {
-    const tagger=actors[1+Math.floor(Math.random()*10)];
-    tagger.human=false;
-    tagger.root.children.forEach((obj,i)=>{
-      if (obj.material && obj.material.color && i<3)
-        obj.material.color.set(currentSkinColor());
-    });
-    tagger.marker.material.color.set(0xff3c9d);
-    $("notice").textContent=tagger.name+" is the furry tagger! Run!";
+  let playerFurry = false;
+  let infectedCount = 0;
+  let tags = 0;
+  let time = 300;
+  let coinsEarned = 0;
+  let ended = false;
+  let last = performance.now();
+  let raf = 0;
+
+  const obstacles = [];
+  for (let i=0;i<20;i++) {
+    const x = (Math.random()-.5)*46;
+    const z = (Math.random()-.5)*46;
+    if (Math.abs(x)<4 && Math.abs(z)<4) continue;
+
+    const tree = new THREE.Group();
+    tree.position.set(x,0,z);
+    scene.add(tree);
+
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(.2,.28,1.6,7),
+      new THREE.MeshStandardMaterial({color:0x70452d})
+    );
+    trunk.position.y = .8;
+    tree.add(trunk);
+
+    const top = new THREE.Mesh(
+      new THREE.ConeGeometry(1.2,2.6,8),
+      new THREE.MeshStandardMaterial({
+        color:[0x237b48,0x2c8d50,0x347b3f][i%3]
+      })
+    );
+    top.position.y = 2.5;
+    top.castShadow = true;
+    tree.add(top);
+    obstacles.push({x,z,r:1.0});
   }
 
-  for (let i=0;i<26;i++) spawnCandy();
-
-  $("menu").classList.add("hidden");
-  $("hud").style.display="block";
-  $("mobile").style.display="flex";
-  $("roomLabel").textContent="BOT LOBBY · 10 BOTS";
-  $("role").textContent=player.human?"HUMAN SURVIVOR":"FURRY TAGGER";
-  $("bottom").textContent="WASD move · Mouse look · Shift sprint · Collect candy";
-  clock=new THREE.Clock();
-  syncCoins();
-}
-
-function infect(actor) {
-  if (!actor.human) return;
-
-  actor.human=false;
-  actor.root.children.forEach((obj,i)=>{
-    if (obj.material && obj.material.color && i<3)
-      obj.material.color.set(currentSkinColor());
-  });
-  actor.marker.material.color.set(0xff3c9d);
-
-  if (actor.isPlayer) {
-    $("role").textContent="FURRY TAGGER";
-    $("notice").textContent="YOU ARE INFECTED! TAG EVERY HUMAN!";
-  } else {
-    $("notice").textContent=actor.name+" became a furry!";
-  }
-}
-
-function finish(humansWin) {
-  if (gameOver) return;
-
-  gameOver=true;
-  playing=false;
-
-  const humans=actors.filter(a=>a.human).length;
-  const furries=actors.length-humans;
-  const reward=(humansWin?30:20)+humans*3+roundEarn;
-
-  coins+=reward;
-  save();
-
-  $("hud").style.display="none";
-  $("mobile").style.display="none";
-  $("menu").classList.remove("hidden");
-  $("home").classList.add("hidden");
-  $("garage").classList.add("hidden");
-  $("end").classList.remove("hidden");
-
-  $("endtitle").textContent=humansWin?"HUMANS WIN!":"FURRIES WIN!";
-  $("endtext").textContent=
-    (humansWin?"At least one human survived!":"Everyone was transformed!")+
-    " You earned "+reward+" candy. Humans: "+humans+" · Furries: "+furries;
-
-  document.exitPointerLock?.();
-}
-
-function moveActor(actor,dx,dz,dt) {
-  const len=Math.hypot(dx,dz)||1;
-
-  actor.root.position.x=Math.max(-45,Math.min(45,
-    actor.root.position.x+dx/len*actor.speed*dt
-  ));
-  actor.root.position.z=Math.max(-45,Math.min(45,
-    actor.root.position.z+dz/len*actor.speed*dt
-  ));
-
-  if (Math.abs(dx)+Math.abs(dz)>.01)
-    actor.root.rotation.y=Math.atan2(dx,dz);
-}
-
-function distance(a,b) {
-  return Math.hypot(
-    a.root.position.x-b.root.position.x,
-    a.root.position.z-b.root.position.z
-  );
-}
-
-function distanceXZ(a,b) {
-  return Math.hypot(a.x-b.x,a.z-b.z);
-}
-
-function update(dt) {
-  if (!playing) return;
-
-  roundTime-=dt;
-
-  if (roundTime<=0) {
-    roundTime=0;
-    finish(actors.some(a=>a.human));
-    return;
+  const pickups = [];
+  for (let i=0;i<12;i++) {
+    const pickup = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(.28,0),
+      new THREE.MeshStandardMaterial({
+        color:0xffdf55,emissive:0x5e3500,emissiveIntensity:.5
+      })
+    );
+    pickup.position.set((Math.random()-.5)*34,.65,(Math.random()-.5)*34);
+    scene.add(pickup);
+    pickups.push(pickup);
   }
 
-  const sprint=keys.ShiftLeft||keys.ShiftRight||keys.shift;
-  player.speed=sprint?10:7;
+  function pos(actor) { return actor.group.position; }
 
-  let dx=(keys.d||keys.ArrowRight?1:0)-
-         (keys.a||keys.ArrowLeft?1:0);
-  let dz=(keys.s||keys.ArrowDown?1:0)-
-         (keys.w||keys.ArrowUp?1:0);
+  function furryify(actor) {
+    if (actor.furry) return;
+    actor.furry = true;
+    actor.body.material.color.setHex(mats.infected);
+    actor.head.material.color.setHex(mats.infected);
+    addEars(actor.group,mats.infected);
+    infectedCount++;
+  }
 
-  const sin=Math.sin(yaw),cos=Math.cos(yaw);
-  const mx=dx*cos+dz*sin;
-  const mz=-dx*sin+dz*cos;
+  function tag() {
+    if (!playerFurry) {
+      $('message').textContent = 'You are not infected yet! Get tagged by a furry.';
+      return;
+    }
 
-  moveActor(player,mx,mz,dt);
+    let nearest = null;
+    let distance = 2.7;
 
-  for (const actor of actors) {
-    actor.tagCooldown=Math.max(0,actor.tagCooldown-dt);
-    if (actor.isPlayer) continue;
+    for (const bot of bots) {
+      if (!bot.alive || bot.furry) continue;
+      const d = pos(player).distanceTo(pos(bot));
+      if (d<distance) {
+        distance = d;
+        nearest = bot;
+      }
+    }
 
-    actor.ai-=dt;
+    if (nearest) {
+      furryify(nearest);
+      tags++;
+      $('message').textContent = 'Tagged a bot!';
+      $('roundInfo').textContent = 'Bots infected: ' + infectedCount;
+    } else {
+      $('message').textContent = 'No human bot close enough to tag!';
+    }
+  }
 
-    if (actor.ai<=0) {
-      actor.ai=.4+Math.random()*1.2;
+  function endRound(won,title) {
+    if (ended) return;
+    ended = true;
+    cancelAnimationFrame(raf);
+    clearInterval(clock);
 
-      if (actor.human) {
-        const threats=actors
-          .filter(t=>!t.human)
-          .sort((a,b)=>distance(actor,a)-distance(actor,b));
+    coinsEarned += won ? 50 : 15;
+    save.coins += coinsEarned;
+    store(SAVE,save);
 
-        const threat=threats[0];
+    $('endTitle').textContent = title;
+    $('endText').textContent = won ? 'Round complete! Great work.' : 'Round over! Try again.';
+    $('endCoins').textContent = coinsEarned;
+    $('endTags').textContent = tags;
+    $('hud').style.display = 'none';
+    $('end').classList.remove('hidden');
+  }
 
-        if (threat && distance(actor,threat)<18) {
-          actor.target={
-            x:actor.root.position.x+
-              (actor.root.position.x-threat.root.position.x)*2,
-            z:actor.root.position.z+
-              (actor.root.position.z-threat.root.position.z)*2
-          };
-        } else {
-          actor.target={
-            x:Math.random()*70-35,
-            z:Math.random()*70-35
-          };
-        }
+  function update(dt) {
+    if (ended) return;
+
+    let dx=0,dz=0;
+    dx += (keys.a||keys.arrowleft||move.left) ? -1 : 0;
+    dx += (keys.d||keys.arrowright||move.right) ? 1 : 0;
+    dz += (keys.w||keys.arrowup||move.up) ? -1 : 0;
+    dz += (keys.s||keys.arrowdown||move.down) ? 1 : 0;
+
+    const length = Math.hypot(dx,dz)||1;
+    pos(player).x += dx/length*player.speed*dt;
+    pos(player).z += dz/length*player.speed*dt;
+    pos(player).x = THREE.MathUtils.clamp(pos(player).x,-43,43);
+    pos(player).z = THREE.MathUtils.clamp(pos(player).z,-43,43);
+
+    for (const bot of bots) {
+      if (!bot.alive) continue;
+      const p = pos(bot), q = pos(player);
+      let tx,tz;
+
+      if (bot.furry) {
+        tx=q.x; tz=q.z;
       } else {
-        const targets=actors.filter(t=>t.human)
-          .sort((a,b)=>distance(actor,a)-distance(actor,b));
+        tx=p.x+Math.sin(performance.now()*.0007+p.z)*3;
+        tz=p.z+Math.cos(performance.now()*.0008+p.x)*3;
+      }
 
-        actor.target=targets[0]?.root.position||null;
+      let vx=tx-p.x, vz=tz-p.z;
+      const distance=Math.hypot(vx,vz)||1;
+      p.x += vx/distance*bot.speed*dt;
+      p.z += vz/distance*bot.speed*dt;
+      p.x = THREE.MathUtils.clamp(p.x,-44,44);
+      p.z = THREE.MathUtils.clamp(p.z,-44,44);
+
+      if (bot.furry && !playerFurry && p.distanceTo(q)<1.0) {
+        playerFurry=true;
+        furryify(player);
+        $('roleLabel').textContent='FURRY';
+        $('message').textContent='INFECTED! Tag the remaining humans!';
+        $('actionBtn').textContent='TAG!';
+      }
+
+      if (!bot.furry && playerFurry && p.distanceTo(q)<1.5 && Math.random()<.009) {
+        furryify(bot);
       }
     }
 
-    if (actor.target) {
-      moveActor(
-        actor,
-        actor.target.x-actor.root.position.x,
-        actor.target.z-actor.root.position.z,
-        dt
-      );
-    }
-  }
-
-  // Contact spreads infection.
-  for (const furry of actors) {
-    if (furry.human) continue;
-
-    for (const human of actors) {
-      if (human.human &&
-          distance(furry,human)<1.25 &&
-          human.tagCooldown<=0) {
-        infect(human);
-        human.tagCooldown=1.3;
+    for (let i=pickups.length-1;i>=0;i--) {
+      if (pos(player).distanceTo(pickups[i].position)<1.1) {
+        scene.remove(pickups[i]);
+        pickups.splice(i,1);
+        save.coins+=5;
+        coinsEarned+=5;
+        $('coins').textContent=save.coins;
       }
     }
+
+    const q=pos(player);
+    camera.position.lerp(new THREE.Vector3(q.x,q.y+6,q.z+9),.09);
+    camera.lookAt(q.x,q.y+1,q.z);
+
+    $('roundInfo').textContent = playerFurry
+      ? `Infected: ${bots.filter(b=>b.furry).length+1}/11`
+      : 'Survive until the timer ends';
+
+    const humans = bots.filter(b=>b.alive&&!b.furry).length + (playerFurry?0:1);
+    if (playerFurry && humans===0) endRound(true,'ALL INFECTED!');
   }
 
-  // Collect candy.
-  for (const candy of candies) {
-    if (candy.alive &&
-        distanceXZ(player.root.position,candy.mesh.position)<1) {
-      candy.alive=false;
-      scene.remove(candy.mesh);
-      coins++;
-      roundEarn++;
-      save();
-      $("notice").textContent="+1 candy!";
-    }
+  function animate(now) {
+    raf=requestAnimationFrame(animate);
+    const dt=Math.min((now-last)/1000,.05);
+    last=now;
+    update(dt);
+    renderer.render(scene,camera);
   }
 
-  if (actors.filter(a=>a.human).length===0) {
-    finish(false);
-    return;
-  }
-
-  $("clock").textContent=
-    Math.floor(roundTime/60)+":"+
-    String(Math.floor(roundTime%60)).padStart(2,"0");
-
-  $("clock").style.color=roundTime<30?"#ff7777":"white";
-  $("humans").textContent=actors.filter(a=>a.human).length;
-  $("furries").textContent=actors.filter(a=>!a.human).length;
-  $("coins").textContent=coins;
-  $("role").textContent=player.human?"HUMAN SURVIVOR":"FURRY TAGGER";
-
-  const p=player.root.position;
-  const back=new THREE.Vector3(
-    p.x+Math.sin(yaw)*9,
-    p.y+5.5,
-    p.z+Math.cos(yaw)*9
-  );
-
-  camera.position.lerp(back,.12);
-  camera.lookAt(p.x,p.y+1.3,p.z);
-
-  for (const candy of candies) {
-    if (candy.alive) {
-      candy.mesh.rotation.y+=dt*1.8;
-      candy.mesh.position.y=.65+
-        Math.sin(performance.now()*.003+candy.phase)*.12;
-    }
-  }
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  if (!renderer) return;
-
-  const dt=Math.min(.04,clock?clock.getDelta():.016);
-  update(dt);
-
-  if (scene) renderer.render(scene,camera);
-}
-
-function showGarage() {
-  $("home").classList.add("hidden");
-  $("end").classList.add("hidden");
-  $("garage").classList.remove("hidden");
-  $("menu").classList.remove("hidden");
-  $("skinlist").innerHTML="";
-
-  for (const skin of skinData) {
-    const div=document.createElement("div");
-    div.className="choice";
-
-    div.innerHTML=
-      '<div class="emoji">'+skin[1].split(" ")[0]+'</div>'+
-      '<h3>'+skin[1].slice(skin[1].indexOf(" ")+1)+'</h3>'+
-      '<p>'+(owned.includes(skin[0])?"Owned":skin[2]+" candy")+'</p>'+
-      '<p>'+(equipped===skin[0]?"✓ Equipped":"")+'</p>';
-
-    div.onclick=()=>{
-      if (owned.includes(skin[0])) {
-        equipped=skin[0];
-      } else if (coins>=skin[2]) {
-        coins-=skin[2];
-        owned.push(skin[0]);
-        equipped=skin[0];
-      } else {
-        $("onlineStatus").textContent="Not enough candy!";
-        return;
-      }
-
-      save();
-      showGarage();
-    };
-
-    $("skinlist").appendChild(div);
-  }
-
-  syncCoins();
-}
-
-function lobby() {
-  playing=false;
-  document.exitPointerLock?.();
-
-  $("hud").style.display="none";
-  $("mobile").style.display="none";
-  $("menu").classList.remove("hidden");
-  $("home").classList.remove("hidden");
-  $("garage").classList.add("hidden");
-  $("end").classList.add("hidden");
-}
-
-function requestPointer() {
-  renderer.domElement.requestPointerLock?.();
-}
-
-document.addEventListener("mousemove",e=>{
-  if (document.pointerLockElement===renderer?.domElement && playing) {
-    yaw-=e.movementX*.0025;
-  }
-});
-
-document.addEventListener("keydown",e=>{
-  keys[e.key]=true;
-  keys[e.key.toLowerCase()]=true;
-  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))
-    e.preventDefault();
-});
-
-document.addEventListener("keyup",e=>{
-  keys[e.key]=false;
-  keys[e.key.toLowerCase()]=false;
-});
-
-$("bots").onclick=()=>{
-  $("bots").classList.add("selected");
-  $("online").classList.remove("selected");
-  $("onlinePanel").classList.add("hidden");
-};
-
-$("online").onclick=()=>{
-  $("onlinePanel").classList.remove("hidden");
-  $("onlineStatus").textContent=
-    "This build is bot-only. No multiplayer server is required.";
-};
-
-$("start").onclick=()=>{
-  startRound();
-};
-
-$("skins").onclick=showGarage;
-$("back").onclick=lobby;
-$("leave").onclick=lobby;
-$("endhome").onclick=lobby;
-$("again").onclick=startRound;
-
-document.querySelectorAll("[data-key]").forEach(button=>{
-  const key=button.dataset.key;
-
-  button.addEventListener("pointerdown",e=>{
-    e.preventDefault();
-    keys[key]=true;
-  });
-
-  ["pointerup","pointercancel","pointerleave"].forEach(event=>{
-    button.addEventListener(event,()=>keys[key]=false);
-  });
-});
-
-$("jump").addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  keys.shift=true;
-});
-
-["pointerup","pointercancel","pointerleave"].forEach(event=>{
-  $("jump").addEventListener(event,()=>keys.shift=false);
-});
-
-const host=$("scene");
-
-host.addEventListener("pointerdown",e=>{
-  if (e.pointerType==="mouse") {
-    mouseDown=true;
-    lastPointer={x:e.clientX,y:e.clientY};
-  }
-});
-
-addEventListener("pointerup",()=>mouseDown=false);
-
-addEventListener("pointermove",e=>{
-  if (mouseDown && playing) {
-    yaw-=(e.clientX-lastPointer.x)*.006;
-    lastPointer={x:e.clientX,y:e.clientY};
-  }
-});
-
-addEventListener("resize",()=>{
-  if (camera && renderer) {
+  function onResize() {
     camera.aspect=innerWidth/innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth,innerHeight);
   }
-});
 
-setup3D();
-syncCoins();
-animate();
+  addEventListener('resize',onResize);
+  animate(performance.now());
 
+  clock=setInterval(()=>{
+    if (ended) return;
+    time--;
+    const minutes=Math.floor(time/60);
+    const seconds=String(time%60).padStart(2,'0');
+    $('timer').textContent=minutes+':'+seconds;
+    if (time<=0) endRound(!playerFurry,'TIME UP!');
+  },1000);
+
+  return {
+    code,
+    tag,
+    dispose() {
+      cancelAnimationFrame(raf);
+      clearInterval(clock);
+      removeEventListener('resize',onResize);
+      renderer.dispose();
+      root.innerHTML='';
+    }
+  };
+}
 })();
 </script>
 </body>
